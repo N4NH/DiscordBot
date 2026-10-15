@@ -1,0 +1,15 @@
+# ========================================================
+# DANH SÁCH VĂN MẪU CUTE / NGOAN NGOÃN (/rep)
+# ========================================================
+# - Mỗi dòng là 1 câu phản hồi riêng biệt.
+# - Dùng [@] hoặc @[] ở nơi bạn muốn thay thế bằng tên người được rep.
+# - Dòng bắt đầu bằng dấu # là ghi chú (sẽ không tính là văn mẫu).
+# - Bạn có thể thêm, sửa, xóa câu tùy ý trực tiếp trong file này. Bot sẽ tự cập nhật ngay lập tức!
+# ========================================================
+
+dạ oki lùn [@] ( ˶ˆ꒳ˆ˵ )
+vâng ạ [@] 
+à vâng [@]
+oki [@]
+à oki [@]
+da oki [@]

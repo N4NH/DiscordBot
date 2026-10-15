@@ -1,0 +1,19 @@
+# ========================================================
+# DANH SÁCH VĂN MẪU CHỬI BẬY
+# ========================================================
+# - Mỗi dòng là 1 câu văn mẫu riêng biệt.
+# - Dùng [@] ở nơi bạn muốn thay thế bằng tên người bị chửi (hoặc {target}).
+# - Dòng bắt đầu bằng dấu # là ghi chú (sẽ không tính là văn mẫu).
+# - Bạn có thể thêm, sửa, xóa câu tùy ý trực tiếp trong file này. Bot sẽ tự cập nhật ngay lập tức!
+# ========================================================
+
+đm thằng [@] nhìn cái mặt là thấy ghét rồi đấy!
+Não của [@] chắc để trưng cho đẹp chứ có dùng bao giờ đâu đúng không?
+Lồn rác bú cu tao nè con [@] !
+Mày là thiên tài [@] !
+Mày ăn cứt [@]
+Địt cụ mày [@] !
+Súc vật [@]
+[@] ơi, [@] lớn rồi, đi học thành tài, đi kiếm sống được rồi. Làm ơn banh cái đầu tró của mình ra đó, nha, để mà hiểu và làm người lớn một chút xíu. Đừng có cái kiểu như vậy nữa. Em không bao giờ làm được chuyện gì lớn trên cuộc đời này. Ha. Không bao giờ thành công được. Còn ở trên á, con nít nó ngoo thì cũng còn có người lớn mà dạy. Ở đâu mà cả một chùm một lũ ngoo theo như vậy, hả? [@] sống bằng cái kiểu này hả? Hay sao? Đây là cái nồi cơm của tụi bay hay sao?
+[@] Ngu như con chó ăn cứt !
+Địt con mẹ mày mày thích mất dạy không thằng lồn [@]?
