@@ -73,18 +73,23 @@ async def download_image_from_url(url: str) -> Optional[str]:
     return None
 
 
+# Chế độ chờ (Standby Mode): Tạm ẩn việc mở trình duyệt Edge, giữ lại toàn bộ code để kích hoạt lại sau
+GEMINI_STANDBY_MODE = os.getenv("GEMINI_STANDBY", "true").lower() in ["true", "1", "yes"]
+STANDBY_MESSAGE = (
+    "🛠️ **Tính năng Gemini hiện đang tạm đóng để nâng cấp/bảo trì.**\n"
+    "👉 Bạn có thể sử dụng lệnh `/gpt <câu_hỏi>` để trò chuyện với AI thông minh nhé!"
+)
+
 class GeminiCog(commands.Cog, name="Gemini"):
     """
-    Cog tích hợp Gemini Web trực tiếp qua Chrome for Testing (CfT).
-    - Tự do nhập bất cứ thứ gì: chữ, ảnh đính kèm, link ảnh hoặc reply tin nhắn.
-    - Phân quyền nghiêm ngặt theo ALLOWED_AI_USERS.
-    - Cảnh báo khi có người đang sử dụng.
+    Cog tích hợp Gemini Web trực tiếp qua Chrome for Testing (CfT) / Microsoft Edge.
+    - Đang ở chế độ chờ (Standby), không tự động bật Edge hay tốn tài nguyên.
     """
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        # Mở trình duyệt trực quan (headless=False)
-        self.client = GeminiBrowserClient(headless=False)
+        # Chỉ khởi tạo browser client khi không ở chế độ chờ
+        self.client = None if GEMINI_STANDBY_MODE else GeminiBrowserClient(headless=False)
         self.current_user: Optional[str] = None
 
         # Đăng ký Message Context Menu để chuột phải vào tin nhắn bất kỳ và hỏi Gemini
@@ -95,13 +100,18 @@ class GeminiCog(commands.Cog, name="Gemini"):
         self.bot.tree.add_command(self.ctx_menu)
 
     async def _safe_start(self):
+        if not self.client:
+            return
         try:
             await self.client.start()
         except Exception as e:
             print(f"[GeminiCog] Chưa thể khởi chạy Gemini Browser tự động ({e}). Trình duyệt sẽ được khởi động lại khi có lệnh gọi.", flush=True)
 
     async def cog_load(self):
-        """Khởi động và tải sẵn trang Gemini ngay khi bot bật để sẵn sàng tức thì."""
+        """Khởi động trang Gemini nếu không ở chế độ chờ."""
+        if GEMINI_STANDBY_MODE:
+            print("[GeminiCog] Tính năng Gemini đang ở chế độ chờ (Standby) - Đã tắt tự động mở Edge.", flush=True)
+            return
         asyncio.create_task(self._safe_start())
 
     async def cog_unload(self):
@@ -110,10 +120,11 @@ class GeminiCog(commands.Cog, name="Gemini"):
             self.bot.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
         except Exception:
             pass
-        try:
-            await self.client.stop()
-        except Exception:
-            pass
+        if self.client:
+            try:
+                await self.client.stop()
+            except Exception:
+                pass
 
     async def _safe_send_response(self, interaction: discord.Interaction, chunks: list[str]):
         """Gửi tin nhắn an toàn, nếu webhook interaction bị lỗi (ví dụ 404) sẽ fallback sang channel.send."""
@@ -141,6 +152,11 @@ class GeminiCog(commands.Cog, name="Gemini"):
 
         # Kiểm tra xem bot có được tag trong tin nhắn không
         if not self.bot.user or self.bot.user not in message.mentions:
+            return
+
+        # Nếu đang ở chế độ chờ, phản hồi thông báo và không bật browser
+        if GEMINI_STANDBY_MODE:
+            await message.reply(STANDBY_MESSAGE, mention_author=False)
             return
 
         # 1. Kiểm tra phân quyền người dùng
@@ -257,6 +273,10 @@ class GeminiCog(commands.Cog, name="Gemini"):
         file: Optional[discord.Attachment] = None
     ):
         """Slash command /gemini [input] [file]"""
+        if GEMINI_STANDBY_MODE:
+            await interaction.response.send_message(STANDBY_MESSAGE, ephemeral=True)
+            return
+
         # 1. Kiểm tra phân quyền
         if not is_user_authorized(interaction.user):
             await interaction.response.send_message(
@@ -329,6 +349,10 @@ class GeminiCog(commands.Cog, name="Gemini"):
         - Kéo thả bao nhiêu ảnh tùy thích vào tin nhắn.
         - Reply tin nhắn của bất kỳ ai để Gemini phân tích cả câu hỏi lẫn ảnh của họ!
         """
+        if GEMINI_STANDBY_MODE:
+            await ctx.reply(STANDBY_MESSAGE, mention_author=False)
+            return
+
         # 1. Kiểm tra phân quyền
         if not is_user_authorized(ctx.author):
             await ctx.reply(
@@ -426,6 +450,10 @@ class GeminiCog(commands.Cog, name="Gemini"):
 
     async def context_menu_gemini(self, interaction: discord.Interaction, message: discord.Message):
         """Xử lý khi người dùng click chuột phải vào tin nhắn -> Apps -> 'Hỏi Gemini tin nhắn này'."""
+        if GEMINI_STANDBY_MODE:
+            await interaction.response.send_message(STANDBY_MESSAGE, ephemeral=True)
+            return
+
         if not is_user_authorized(interaction.user):
             await interaction.response.send_message(
                 "🚫 **Từ chối truy cập!** Bạn không có quyền sử dụng Gemini trên bot này.",
