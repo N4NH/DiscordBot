@@ -1,4 +1,5 @@
 import asyncio
+import os
 import re
 import json
 import random
@@ -11,7 +12,7 @@ from discord import app_commands
 from discord.ext import commands
 import yt_dlp
 
-# Cấu hình yt-dlp tối ưu cho phát nhạc trực tiếp
+# Cấu hình yt-dlp tối ưu cho phát nhạc trực tiếp & vượt tường bot detection
 YTDL_BASE_OPTIONS: Dict[str, Any] = {
     'format': 'bestaudio/best',
     'noplaylist': True,
@@ -22,7 +23,20 @@ YTDL_BASE_OPTIONS: Dict[str, Any] = {
     'nocheckcertificate': True,
     'ignoreerrors': False,
     'extract_flat': False,
+    'extractor_args': {
+        'youtube': {
+            'player_client': ['ios', 'android'],
+        }
+    }
 }
+
+# Tự động nạp cookies.txt nếu có trong thư mục gốc
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+COOKIE_FILE = os.path.join(ROOT_DIR, "cookies.txt")
+if os.path.exists(COOKIE_FILE):
+    YTDL_BASE_OPTIONS['cookiefile'] = COOKIE_FILE
+elif os.path.exists("cookies.txt"):
+    YTDL_BASE_OPTIONS['cookiefile'] = "cookies.txt"
 
 FFMPEG_OPTIONS = {
     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
